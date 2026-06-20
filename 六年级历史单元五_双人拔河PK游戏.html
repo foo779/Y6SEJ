@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>六年级历史单元五｜双人拔河PK</title>
+  <style>
+    :root{
+      --bg1:#fff6df;
+      --bg2:#e8f5ff;
+      --red:#ff5d73;
+      --red-dark:#c8384e;
+      --blue:#4f8cff;
+      --blue-dark:#2f5fb4;
+      --ink:#24324a;
+      --card:#ffffffee;
+      --good:#31b86b;
+      --bad:#ef5350;
+      --gold:#f7b731;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;font-family:"YouYuan","幼圆","Yuanti SC","圆体-简",system-ui,sans-serif;color:var(--ink);background:
+      radial-gradient(circle at 15% 15%,#fff3b8 0 10%,transparent 11%),
+      radial-gradient(circle at 88% 20%,#ffd5df 0 9%,transparent 10%),
+      linear-gradient(135deg,var(--bg1),var(--bg2));
+      overflow:hidden;
+      touch-action:manipulation;
+    }
+    button{font:inherit}
+    .app{height:100%;display:flex;flex-direction:column;gap:10px;padding:10px}
+    .topbar{
+      display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+      background:var(--card);border:3px solid #fff;border-radius:22px;padding:10px 14px;
+      box-shadow:0 10px 25px #4b5a7a22;
+    }
+    .team{font-weight:900;font-size:clamp(16px,2.6vw,28px)}
+    .team.red{text-align:left;color:var(--red-dark)}
+    .team.blue{text-align:right;color:var(--blue-dark)}
+    .timer{
+      min-width:110px;text-align:center;background:#24324a;color:#fff;
+      padding:8px 14px;border-radius:999px;font-weight:900;font-size:clamp(18px,3vw,30px)
+    }
+    .arena{
+      background:var(--card);border-radius:22px;padding:10px 14px;
+      box-shadow:0 10px 25px #4b5a7a22;
+    }
+    .rope-track{position:relative;height:64px;display:flex;align-items:center}
+    .center-line{position:absolute;left:50%;top:4px;bottom:4px;width:4px;background:#33415c;border-radius:4px;transform:translateX(-50%)}
+    .rope{
+      position:absolute;left:8%;right:8%;height:12px;border-radius:12px;
+      background:repeating-linear-gradient(45deg,#b77835 0 8px,#e3b66c 8px 16px);
+      box-shadow:inset 0 0 0 2px #8d5a24;
+    }
+    .knot{
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:30px;height:30px;border-radius:50%;background:var(--gold);border:5px solid #fff;
+      box-shadow:0 3px 8px #0003;transition:left .35s ease;
+    }
+    .score-row{display:flex;justify-content:space-between;font-weight:900;font-size:clamp(17px,2.7vw,28px)}
+    .game{
+      flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;
+    }
+    .panel{
+      min-height:0;background:var(--card);border-radius:22px;padding:14px;
+      display:flex;flex-direction:column;box-shadow:0 10px 25px #4b5a7a22;
+      border:4px solid transparent;
+    }
+    .panel.red{border-color:#ffd0d8}
+    .panel.blue{border-color:#cfe0ff}
+    .panel h2{margin:0 0 8px;text-align:center;font-size:clamp(18px,3vw,30px)}
+    .question-no{text-align:center;font-weight:800;opacity:.72;margin-bottom:6px}
+    .question{
+      flex:0 0 auto;min-height:82px;background:#f7f9fc;border-radius:16px;padding:12px;
+      display:flex;align-items:center;justify-content:center;text-align:center;
+      font-weight:900;font-size:clamp(16px,2.3vw,24px);line-height:1.35;
+      margin-bottom:10px;
+    }
+    .answers{display:grid;grid-template-columns:1fr 1fr;gap:9px;min-height:0}
+    .answer{
+      min-height:58px;border:0;border-radius:15px;padding:10px;
+      background:#fff;border:2px solid #d8e0ed;color:var(--ink);font-weight:800;
+      box-shadow:0 4px 0 #cfd8e8;cursor:pointer;transition:.12s transform,.12s box-shadow,.12s background;
+    }
+    .answer:active{transform:translateY(3px);box-shadow:0 1px 0 #cfd8e8}
+    .panel.red .answer:hover{background:#fff0f3}
+    .panel.blue .answer:hover{background:#eef4ff}
+    .feedback{
+      min-height:30px;margin-top:8px;text-align:center;font-weight:900;font-size:17px;
+    }
+    .correct{color:var(--good)}
+    .wrong{color:var(--bad)}
+    .footer{display:flex;justify-content:center}
+    .sound-btn,.restart-btn{
+      border:0;border-radius:999px;padding:9px 16px;background:#24324a;color:#fff;font-weight:900;cursor:pointer
+    }
+    .overlay{
+      position:fixed;inset:0;background:#24324acc;display:flex;align-items:center;justify-content:center;
+      padding:20px;z-index:10;
+    }
+    .hidden{display:none}
+    .modal{
+      width:min(620px,95vw);background:#fff;border-radius:28px;padding:28px;text-align:center;
+      box-shadow:0 20px 60px #0006;
+    }
+    .modal h1{font-size:clamp(28px,6vw,54px);margin:0 0 10px}
+    .modal p{font-size:clamp(16px,2.6vw,22px);line-height:1.5}
+    .start-btn{
+      border:0;border-radius:18px;padding:15px 28px;font-weight:900;font-size:22px;
+      background:linear-gradient(135deg,var(--red),var(--blue));color:#fff;cursor:pointer;
+      box-shadow:0 8px 0 #35476e;
+    }
+    @media (max-width:760px){
+      html,body{overflow:auto}
+      .app{min-height:100%;height:auto}
+      .game{grid-template-columns:1fr}
+      .panel{min-height:440px}
+      .topbar{position:sticky;top:0;z-index:4}
+    }
+    @media (max-width:430px){
+      .app{padding:6px;gap:7px}
+      .topbar,.arena,.panel{border-radius:16px}
+      .topbar{padding:8px}
+      .timer{min-width:86px;padding:7px 10px}
+      .panel{padding:10px}
+      .question{min-height:74px}
+      .answer{min-height:54px;padding:8px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="team red">🔴 红队</div>
+      <div class="timer">⏱ <span id="time">100</span>s</div>
+      <div class="team blue">蓝队 🔵</div>
+    </div>
+
+    <div class="arena">
+      <div class="rope-track">
+        <div class="rope"></div>
+        <div class="center-line"></div>
+        <div class="knot" id="knot"></div>
+      </div>
+      <div class="score-row">
+        <span style="color:var(--red-dark)">红队：<span id="redScore">0</span></span>
+        <span style="color:var(--blue-dark)">蓝队：<span id="blueScore">0</span></span>
+      </div>
+    </div>
+
+    <div class="game">
+      <section class="panel red">
+        <h2>红队作答区</h2>
+        <div class="question-no" id="redNo">第 1 题</div>
+        <div class="question" id="redQuestion"></div>
+        <div class="answers" id="redAnswers"></div>
+        <div class="feedback" id="redFeedback"></div>
+      </section>
+
+      <section class="panel blue">
+        <h2>蓝队作答区</h2>
+        <div class="question-no" id="blueNo">第 1 题</div>
+        <div class="question" id="blueQuestion"></div>
+        <div class="answers" id="blueAnswers"></div>
+        <div class="feedback" id="blueFeedback"></div>
+      </section>
+    </div>
+
+    <div class="footer">
+      <button class="sound-btn" id="soundBtn">🔊 音效：开</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="modal">
+      <h1>六年级历史单元五</h1>
+      <p><b>双人同屏拔河PK</b><br>双方同时作答，答对加10分并把绳结拉向自己。<br>限时100秒，分数较高的一队获胜！</p>
+      <button class="start-btn" id="startBtn">开始游戏</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="modal">
+      <h1 id="winnerText">游戏结束</h1>
+      <p id="finalScore"></p>
+      <button class="start-btn" id="restartBtn">重新开始</button>
+    </div>
+  </div>
+
+<script>
+const questions = [
+  {q:"马来西亚的联邦宗教是什么？",o:["佛教","伊斯兰教","兴都教","基督教"],a:1},
+  {q:"马来西亚人民信奉宗教的自由受到什么保障？",o:["学校规则","联邦宪法","社区条例","家庭传统"],a:1},
+  {q:"伊斯兰教徒通常到哪里进行宗教活动？",o:["教堂","兴都庙","清真寺","佛寺"],a:2},
+  {q:"基督教徒的宗教场所是什么？",o:["教堂","清真寺","华人民间庙宇","佛寺"],a:0},
+  {q:"佛教徒通常到哪里进行膜拜？",o:["清真寺","佛寺","教堂","谒师所"],a:1},
+  {q:"兴都教徒主要在哪一种场所进行宗教活动？",o:["兴都庙","教堂","清真寺","会馆"],a:0},
+  {q:"锡克教徒进行宗教活动的场所称为什么？",o:["教堂","佛寺","谒师所","清真寺"],a:2},
+  {q:"下列哪一项属于马来西亚人民信奉的宗教？",o:["伊斯兰教","佛教","基督教","以上皆是"],a:3},
+  {q:"原住民的一些传统信仰通常与什么有关？",o:["股票市场","大自然和祖先","现代交通","国际贸易"],a:1},
+  {q:"下列哪一项是华人社会常见的宗教或信仰？",o:["佛教和道教","只有伊斯兰教","只有锡克教","只有兴都教"],a:0},
+  {q:"马来西亚拥有多种宗教和信仰，主要是因为我国——",o:["只有一个民族","是多元种族国家","没有宗教场所","人口非常少"],a:1},
+  {q:"伊斯兰教徒祈祷时通常朝向哪个方向？",o:["麦加","吉隆坡","布城","马六甲"],a:0},
+  {q:"基督教的经典是什么？",o:["《古兰经》","《圣经》","《吠陀经》","《道德经》"],a:1},
+  {q:"伊斯兰教的经典是什么？",o:["《圣经》","《古兰经》","《论语》","《吠陀经》"],a:1},
+  {q:"兴都教徒常用哪一种经典作为宗教参考？",o:["《吠陀经》","《古兰经》","《圣经》","《三字经》"],a:0},
+  {q:"锡克教的创始人是谁？",o:["孔子","释迦牟尼","拿督南利","古鲁那纳克"],a:3},
+  {q:"佛教的创始人是谁？",o:["古鲁那纳克","释迦牟尼","郑和","巴拉米斯拉"],a:1},
+  {q:"道教文化强调人与什么和谐相处？",o:["大自然","机器","金钱","武器"],a:0},
+  {q:"下列哪一项显示我们尊重其他宗教？",o:["嘲笑宗教服装","在宗教场所喧哗","遵守宗教场所规则","强迫别人改变信仰"],a:2},
+  {q:"进入某些宗教场所前脱鞋，主要是为了——",o:["节省时间","表示尊重和保持清洁","方便比赛","展示袜子"],a:1},
+  {q:"小明参观清真寺时，最适当的行为是什么？",o:["穿着整齐并保持安静","随意触碰宗教用品","追逐玩耍","大声取笑他人"],a:0},
+  {q:"学校举办宗教文化展览的主要好处是什么？",o:["让学生互相竞争","增加对不同宗教的了解","规定信奉同一宗教","减少交流"],a:1},
+  {q:"邻居正在举行宗教仪式，我们应该——",o:["制造噪音","尊重并避免打扰","嘲笑仪式","要求停止"],a:1},
+  {q:"不同宗教通常都教导信徒——",o:["做好事和尊重他人","破坏公共设施","仇视其他民族","只关心自己"],a:0},
+  {q:"尊重不同宗教和信仰能够——",o:["引起社会冲突","加强人民团结","破坏国家安全","减少文化交流"],a:1},
+  {q:"下列哪一项可能破坏宗教和谐？",o:["了解不同宗教习俗","尊重宗教庆典","散播侮辱宗教的言论","与不同宗教朋友合作"],a:2},
+  {q:"阿里在朋友家看到不同宗教的祭祀用品。他应该——",o:["随意拿来玩","嘲笑朋友","尊重且不随意触碰","把用品藏起来"],a:2},
+  {q:"我们为什么需要了解其他宗教的禁忌？",o:["避免无意冒犯他人","方便取笑别人","阻止庆祝节日","比较哪一种宗教最好"],a:0},
+  {q:"下列哪一种情况最能体现宗教宽容？",o:["只和相同宗教者交朋友","允许各自按照信仰生活","强迫朋友改变宗教","禁止宗教活动"],a:1},
+  {q:"马来西亚人民应该如何维护宗教和谐？",o:["互相尊重、理解和包容","争论哪种宗教最好","散播未经证实消息","破坏宗教场所"],a:0}
+];
+
+let redIndex=0, blueIndex=0, redScore=0, blueScore=0, timeLeft=100, timer=null, running=false, soundOn=true;
+let audioCtx;
+
+function beep(freq=440,duration=.12,type="sine"){
+  if(!soundOn) return;
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    const osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
+    osc.type=type; osc.frequency.value=freq;
+    gain.gain.setValueAtTime(.12,audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);
+    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime+duration);
+  }catch(e){}
+}
+
+function renderTeam(team){
+  const idx = team==="red" ? redIndex : blueIndex;
+  const q = questions[idx % questions.length];
+  document.getElementById(team+"No").textContent = `第 ${idx%questions.length+1} 题`;
+  document.getElementById(team+"Question").textContent = q.q;
+  const wrap=document.getElementById(team+"Answers");
+  wrap.innerHTML="";
+  q.o.forEach((text,i)=>{
+    const b=document.createElement("button");
+    b.className="answer";
+    b.textContent=String.fromCharCode(65+i)+". "+text;
+    b.onclick=()=>answer(team,i);
+    wrap.appendChild(b);
+  });
+}
+
+function answer(team,choice){
+  if(!running) return;
+  const idx=team==="red"?redIndex:blueIndex;
+  const q=questions[idx%questions.length];
+  const fb=document.getElementById(team+"Feedback");
+  if(choice===q.a){
+    if(team==="red") redScore+=10; else blueScore+=10;
+    fb.textContent="✓ 答对了！+10分";
+    fb.className="feedback correct";
+    beep(760,.12,"triangle");
+  }else{
+    fb.textContent="✗ 答错了，进入下一题";
+    fb.className="feedback wrong";
+    beep(180,.18,"sawtooth");
+  }
+  if(team==="red") redIndex++; else blueIndex++;
+  updateScore();
+  setTimeout(()=>{
+    fb.textContent="";
+    renderTeam(team);
+  },350);
+}
+
+function updateScore(){
+  redScoreEl.textContent=redScore;
+  blueScoreEl.textContent=blueScore;
+  const diff=Math.max(-100,Math.min(100,redScore-blueScore));
+  knot.style.left=(50 - diff*0.38)+"%";
+}
+
+function startGame(){
+  redIndex=blueIndex=redScore=blueScore=0;
+  timeLeft=100; running=true;
+  timeEl.textContent=timeLeft;
+  updateScore();
+  renderTeam("red"); renderTeam("blue");
+  startOverlay.classList.add("hidden");
+  endOverlay.classList.add("hidden");
+  clearInterval(timer);
+  timer=setInterval(()=>{
+    timeLeft--;
+    timeEl.textContent=timeLeft;
+    if(timeLeft<=0) endGame();
+  },1000);
+}
+
+function endGame(){
+  running=false; clearInterval(timer);
+  let text="平局！";
+  if(redScore>blueScore) text="🔴 红队胜利！";
+  if(blueScore>redScore) text="🔵 蓝队胜利！";
+  winnerText.textContent=text;
+  finalScore.textContent=`红队 ${redScore} 分 ｜ 蓝队 ${blueScore} 分`;
+  endOverlay.classList.remove("hidden");
+  beep(redScore===blueScore?420:900,.35,"triangle");
+}
+
+const redScoreEl=document.getElementById("redScore");
+const blueScoreEl=document.getElementById("blueScore");
+const timeEl=document.getElementById("time");
+const knot=document.getElementById("knot");
+const startOverlay=document.getElementById("startOverlay");
+const endOverlay=document.getElementById("endOverlay");
+const winnerText=document.getElementById("winnerText");
+const finalScore=document.getElementById("finalScore");
+
+document.getElementById("startBtn").onclick=startGame;
+document.getElementById("restartBtn").onclick=startGame;
+document.getElementById("soundBtn").onclick=()=>{
+  soundOn=!soundOn;
+  document.getElementById("soundBtn").textContent=soundOn?"🔊 音效：开":"🔇 音效：关";
+};
+
+renderTeam("red"); renderTeam("blue");
+</script>
+</body>
+</html>
